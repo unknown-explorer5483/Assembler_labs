@@ -1,0 +1,81 @@
+     1                                     section .data
+     2                                  
+     3 00000000 416E737765723A0A        ExitMsg db "Answer:",10 
+     4                                  lenExit equ $-ExitMsg
+     5                                  
+     6 00000008 456E64657220737472-     EnterMsg db "Ender string:",10 
+     6 00000011 696E673A0A         
+     7                                  lenEnter equ $-EnterMsg
+     8                                  
+     9                                  
+    10                                  wordsLenOut equ 19
+    11                                  wordsLenIn equ 19
+    12                                  
+    13                                      section .bss
+    14                                  
+    15 00000000 <res 13h>               words  resb 19
+    16 00000013 ??                      symbuf resb 1
+    17                                  
+    18                                  
+    19                                      section .text 
+    20                                      global _start
+    21                                  _start:
+    22                                  
+    23 00000000 B801000000                  mov rax, 1
+    24 00000005 BF01000000                  mov rdi, 1
+    25 0000000A 48BE-                       mov rsi, EnterMsg
+    25 0000000C [0800000000000000] 
+    26 00000014 BA0E000000                  mov rdx, lenEnter
+    27                                  
+    28 00000019 0F05                        syscall
+    29                                  
+    30                                      ; read
+    31 0000001B B800000000                  mov rax, 0
+    32 00000020 BF00000000                  mov rdi, 0
+    33 00000025 48BE-                       mov rsi, words
+    33 00000027 [0000000000000000] 
+    34 0000002F BA13000000                  mov rdx, wordsLenIn
+    35                                  
+    36 00000034 0F05                        syscall
+    37                                  
+    38                                  
+    39 00000036 B901000000                  mov RCX,1
+    40 0000003B 488D3C25[13000000]          lea RDI,[symbuf]
+    41 00000043 488D3425[00000000]          lea RSI,[words]
+    42 0000004B F3A4                        rep movsb
+    43                                  
+    44 0000004D B905000000                  mov RCX,5
+    45 00000052 488D3C25[00000000]          lea RDI,[words]
+    46 0000005A 488D3425[01000000]          lea RSI,[words+1]
+    47 00000062 F3A4                        rep movsb
+    48                                  
+    49 00000064 B906000000                  mov RCX,6
+    50 00000069 488D3C25[04000000]          lea RDI,[words+4]
+    51 00000071 488D3425[06000000]          lea RSI,[words+6]
+    52 00000079 F3A4                        rep movsb
+    53                                  
+    54 0000007B B906000000                  mov RCX,6
+    55 00000080 488D3C25[09000000]          lea RDI,[words+9]
+    56 00000088 488D3425[0C000000]          lea RSI,[words+12]
+    57 00000090 F3A4                        rep movsb
+    58                                  
+    59 00000092 B901000000                  mov RCX,1
+    60 00000097 488D3C25[11000000]          lea RDI,[words+17]
+    61 0000009F 488D3425[13000000]          lea RSI,[symbuf]
+    62 000000A7 F3A4                        rep movsb
+    63                                  
+    64 000000A9 C60425[10000000]20          mov BYTE[words+16],32
+    65 000000B1 C60425[0F000000]20          mov BYTE[words+15],32
+    66                                  
+    67 000000B9 B801000000                  mov rax, 1
+    68 000000BE BF01000000                  mov rdi, 1
+    69 000000C3 48BE-                       mov rsi, words
+    69 000000C5 [0000000000000000] 
+    70 000000CD BA13000000                  mov rdx, wordsLenOut
+    71                                  
+    72 000000D2 0F05                        syscall
+    73                                  
+    74 000000D4 B83C000000                  mov rax, 60; системная функция 60 (exit)
+    75 000000D9 4831FF                      xor rdi, rdi; return code 0
+    76 000000DC 0F05                        syscall
+    77                                  

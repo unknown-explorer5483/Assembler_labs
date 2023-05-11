@@ -1,0 +1,1 @@
+struct student { char name[22];char family[22];int old; } st1,ft";

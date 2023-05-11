@@ -1,0 +1,259 @@
+     1                                      section .data
+     2 00000000 61626F206162612061-     String db "abo aba aba ",10,0
+     2 00000009 6261200A00         
+     3 0000000E 202020202020202020-     String2 db "                                        ",0
+     3 00000017 202020202020202020-
+     3 00000020 202020202020202020-
+     3 00000029 202020202020202020-
+     3 00000032 2020202000         
+     4                                  
+     5 00000037 0A                      Enter2 db 10
+     6                                  
+     7                                      section .bss
+     8 00000000 <res 100h>              WordList     resb 256
+     9 00000100 <res 19h>               WordLen      resb 25
+    10                                  ; WordCount    resb 1
+    11                                  
+    12                                  
+    13                                      section .text 
+    14                                      global _start
+    15                                  _start:
+    16                                  	; push rbp 
+    17                                      ; mov rbp,rsp 
+    18                                      ; push rcx 
+    19                                      ; push rax 
+    20                                      ; push rbx
+    21                                      ; push rdx
+    22                                      ; push rdi
+    23                                      ; push rsi
+    24                                      ; push r8
+    25                                      ; push r9
+    26                                      ; push r12
+    27                                      ; push r14
+    28 00000000 4C8D0425[00000000]          lea r8,[String]
+    29                                  
+    30 00000008 E8A5000000                  call getwordspos
+    31                                     
+    32                                  
+    33 0000000D BB00000000                  mov rbx,0
+    34 00000012 B900000000                  mov rcx,0
+    35 00000017 88D1                        mov cl,dl
+    36                                      cycle1:
+    37 00000019 51                          push rcx
+    38                                  
+    39 0000001A 41BE00000000                mov r14,0
+    40 00000020 BA00000000                  mov rdx,0
+    41 00000025 88D9                        mov cl,bl
+    42                                  
+    43                                  
+    44                                  
+    45 00000027 E8C7000000                  call isunique
+    46                                      ;mov rdx,0
+    47                                  
+    48                                  
+    49 0000002C 4883FA00                    cmp rdx,0
+    50 00000030 753C                        jne skipadd
+    51 00000032 51                          push rcx
+    52 00000033 57                          push rdi
+    53 00000034 56                          push rsi
+    54                                  
+    55 00000035 8A8B[01010000]              mov cl,[WordLen+rbx+1]
+    56 0000003B 2A8B[00010000]              sub cl,[WordLen+rbx]
+    57 00000041 FEC9                        dec cl
+    58                                  
+    59                                  
+    60                                      ;mov RCX, wordlen done
+    61 00000043 51                          push rcx
+    62 00000044 4D89C1                      mov r9,r8
+    63 00000047 44028B[00010000]            add r9b,[WordLen+rbx]
+    64 0000004E 4C89CE                      mov RSI,r9
+    65 00000051 498DBC24[00000000]          lea RDI,[WordList+r12]
+    66 00000059 F3A4                        rep movsb
+    67 0000005B 59                          pop rcx
+    68                                  
+    69 0000005C 4100CC                      add r12b,cl
+    70 0000005F 41C68424[00000000]-         mov BYTE[WordList+r12],32
+    70 00000067 20                 
+    71 00000068 41FEC4                      inc r12b
+    72                                  
+    73                                  
+    74                                  
+    75                                  
+    76                                  
+    77 0000006B 5E                          pop rsi 
+    78 0000006C 5F                          pop rdi
+    79 0000006D 59                          pop rcx  
+    80                                      skipadd:
+    81 0000006E 59                          pop rcx
+    82 0000006F 48FFC3                      inc rbx    
+    83                                      ; loop cycle1
+    84 00000072 FFC9                        dec ecx
+    85 00000074 75A3                        jnz cycle1
+    86                                      ;cmp 
+    87                                      ;mov al,0
+    88                                      ;mov [WordList+250],al
+    89                                      ;mov rdi,[WordList]
+    90                                      ; add BYTE[WordLen],48
+    91                                      ; add BYTE[WordLen+1],48
+    92                                      ; add BYTE[WordLen+2],48
+    93                                      ; add BYTE[WordLen+3],48
+    94                                      ; add BYTE[WordCount],48
+    95                                      
+    96 00000076 B801000000                  mov rax, 1; системная функция 1 (write)
+    97 0000007B BF01000000                  mov rdi, 1; дескриптор файла stdout=1
+    98 00000080 488D3425[00000000]          lea rsi, [WordList] ; адрес выводимой строки
+    99 00000088 BA19000000                  mov rdx, 25; длина строки
+   100 0000008D 0F05                        syscall
+   101                                  
+   102                                      ; mov rax, 1; системная функция 1 (write)
+   103                                      ; mov rdi, 1; дескриптор файла stdout=1
+   104                                      ; lea rsi, [WordLen] ; адрес выводимой строки
+   105                                      ; mov rdx, 20; длина строки
+   106                                      ; syscall
+   107                                  
+   108                                  
+   109                                  
+   110 0000008F B801000000                  mov rax, 1; системная функция 1 (write)
+   111 00000094 BF01000000                  mov rdi, 1; дескриптор файла stdout=1
+   112 00000099 488D3425[37000000]          lea rsi, [Enter2] ; адрес выводимой строки
+   113 000000A1 BA01000000                  mov rdx, 1; длина строки
+   114 000000A6 0F05                        syscall
+   115                                  
+   116                                      
+   117                                  
+   118                                  
+   119                                  
+   120 000000A8 B83C000000                  mov rax, 60; системная функция 60 (exit)
+   121 000000AD 4831FF                      xor rdi, rdi; return code 0
+   122 000000B0 0F05                        syscall
+   123                                  
+   124                                      getwordspos:
+   125                                  
+   126 000000B2 41BC00000000                mov r12,0
+   127 000000B8 48C7C3FFFFFFFF              mov rbx,-1
+   128 000000BF BA01000000                  mov rdx,1
+   129                                      nextsym:
+   130 000000C4 48FFC3                      inc rbx
+   131 000000C7 41803C1800                  cmp BYTE[r8+rbx],0
+   132 000000CC 7418                        je after
+   133 000000CE 41803C1820                  cmp BYTE[r8+rbx],32
+   134 000000D3 75EF                        jne nextsym
+   135 000000D5 889A[00010000]              mov [WordLen+rdx],bl
+   136 000000DB FE82[00010000]              inc BYTE[WordLen+rdx]
+   137 000000E1 48FFC2                      inc rdx
+   138 000000E4 EBDE                        jmp nextsym
+   139                                      after:
+   140 000000E6 889A[00010000]              mov [WordLen+rdx],bl
+   141 000000EC FE82[00010000]              inc BYTE[WordLen+rdx]
+   142                                      ; mov [WordCount],dl
+   143                                  
+   144 000000F2 C3                          ret
+   145                                  
+   146                                      isunique:
+   147 000000F3 51                          push rcx
+   148 000000F4 4150                        push r8
+   149 000000F6 4151                        push r9
+   150 000000F8 56                          push rsi 
+   151 000000F9 57                          push rdi
+   152 000000FA 53                          push rbx
+   153 000000FB 4154                        push r12
+   154 000000FD BA00000000                  mov rdx,0   ; not found
+   155                                  
+   156 00000102 BB00000000                  mov rbx,0
+   157 00000107 88CB                        mov bl,cl
+   158 00000109 8A8B[01010000]              mov cl,[WordLen+rbx+1]
+   159 0000010F 2A8B[00010000]              sub cl,[WordLen+rbx]
+   160 00000115 FEC9                        dec cl
+   161                                      ;inc cl
+   162                                  
+   163                                      ;call debugprint
+   164                                      ; correct ++
+   165 00000117 53                          push rbx
+   166 00000118 4989DC                      mov r12,rbx    
+   167                                  cmpagain:
+   168 0000011B 80BB[02010000]00            cmp BYTE[WordLen+rbx+2],0
+   169 00000122 744B                        je endcmp
+   170                                  
+   171                                      ; mov cl,bl
+   172                                      ; call debugprint
+   173                                  
+   174                                      
+   175                                      ; mov cl,[WordLen+rbx]
+   176                                      ; call debugprint
+   177 00000124 418A8C24[01010000]          mov cl,[WordLen+r12+1]
+   178 0000012C 412A8C24[00010000]          sub cl,[WordLen+r12]
+   179 00000134 FEC9                        dec cl
+   180                                  
+   181                                  
+   182 00000136 BE00000000                  mov rsi,0
+   183 0000013B BF00000000                  mov rdi,0
+   184 00000140 408AB3[01010000]            mov sil,[WordLen+rbx+1]
+   185 00000147 4D89C6                      mov r14,r8
+   186 0000014A 4C01F6                      add rsi,r14
+   187 0000014D 418ABC24[00010000]          mov dil,[WordLen+r12]
+   188 00000155 4C01F7                      add rdi,r14
+   189 00000158 FEC1                        inc cl
+   190 0000015A FEC1                        inc cl
+   191 0000015C F3A6                        rep cmpsb
+   192 0000015E 80F900                      cmp cl,0
+   193 00000161 7507                        jne notfound
+   194                                  
+   195 00000163 BA01000000                  mov rdx,1  ; found   
+   196 00000168 EB05                        jmp endcmp
+   197                                  
+   198                                      notfound:
+   199                                      
+   200                                      
+   201 0000016A 48FFC3                      inc rbx
+   202 0000016D EBAC                        jmp cmpagain
+   203                                  endcmp:
+   204 0000016F 5B                          pop rbx
+   205                                  
+   206 00000170 415C                        pop r12
+   207 00000172 5B                          pop rbx
+   208 00000173 5F                          pop rdi
+   209 00000174 5E                          pop rsi
+   210 00000175 4159                        pop r9
+   211 00000177 4158                        pop r8
+   212 00000179 59                          pop rcx
+   213                                  
+   214 0000017A C3                          ret
+   215                                  ; debugprint:
+   216                                  ;     push rax
+   217                                  ;     push rdi
+   218                                  ;     push rsi
+   219                                  ;     push rdx
+   220                                  
+   221                                  ;     mov [Debug],cl
+   222                                  ;     add Byte[Debug],48
+   223                                  
+   224                                  ;     mov rax, 1; системная функция 1 (write)
+   225                                  ;     mov rdi, 1; дескриптор файла stdout=1
+   226                                  ;     lea rsi, [Debug] ; адрес выводимой строки
+   227                                  ;     mov rdx, 1
+   228                                  ;     syscall
+   229                                  
+   230                                  
+   231                                  ;     pop rdx
+   232                                  ;     pop rsi
+   233                                  ;     pop rdi
+   234                                  ;     pop rax
+   235                                  ;     ret
+   236                                  ; debugprint2:
+   237                                  ;     push rax
+   238                                  ;     push rdi
+   239                                  ;     push rsi
+   240                                  ;     push rdx
+   241                                  
+   242                                  ;     mov rax, 1; системная функция 1 (write)
+   243                                  ;     mov rdi, 1; дескриптор файла stdout=1
+   244                                  ;     lea rsi, [Debug] ; адрес выводимой строки
+   245                                  ;     mov rdx, 100
+   246                                  ;     syscall
+   247                                  
+   248                                  
+   249                                  ;     pop rdx
+   250                                  ;     pop rsi
+   251                                  ;     pop rdi
+   252                                  ;     pop rax
+   253                                  ;     ret

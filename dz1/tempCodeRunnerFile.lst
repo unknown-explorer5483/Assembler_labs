@@ -1,0 +1,6 @@
+     1 00000000 B901000000                  mov RCX,1
+     2                                      lea RDI,[words+17]
+     2          ******************       error: symbol `words' not defined
+     3                                      lea RSI,[symbuf]
+     3          ******************       error: symbol `symbuf' not defined
+     4 00000005 F3A4                        rep movsb
